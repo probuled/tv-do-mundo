@@ -11,6 +11,16 @@ O formato segue o [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/) e 
 
 - O globo não gira mais sozinho: ele fica parado e só se move quando a pessoa o gira, o que facilita clicar nos
   canais. Ao soltar, ele para quase na hora, sem continuar deslizando.
+- Novo visual: tudo fica num painel lateral à esquerda (marca, busca, zapear, filtros, favoritos, histórico, Satélite
+  e Sobre), com tipografia Geist, ícones de traço e cores discretas. O globo fica centralizado no espaço livre.
+- O painel lateral pode ser recolhido; recolhido, a busca, o Satélite e o Sobre ficam numa barra compacta no topo. A
+  escolha fica salva no navegador.
+- Os pontos do globo e os chips de categoria usam a mesma paleta, então os chips servem de legenda do mapa.
+- Fundo liso no lugar do céu estrelado.
+
+### Adicionado
+
+- Atalho `/` para ir direto à busca.
 
 ## [0.1.0] - 2026-10-31
 

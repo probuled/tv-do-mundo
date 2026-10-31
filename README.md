@@ -10,7 +10,10 @@ planeta** e deixe o globo viajar sozinho de canal em canal.
 - Filtros por categoria, idioma e país; favoritos, histórico e link para compartilhar (`?canal=ID`)
 - Visual **Satélite** (tecla V): visão noturna, linhas de varredura e HUD com coordenadas, hora local e UTC
 
-**Atalhos:** Z zapear · R canal aleatório · V satélite · Esc fechar o player.
+**Atalhos:** / buscar · Z zapear · R canal aleatório · V satélite · Esc fechar o player.
+
+O painel lateral pode ser recolhido pelo botão no canto dele; recolhido, a busca, o Satélite e o Sobre ficam numa
+barra compacta no topo.
 
 ## Como rodar
 
@@ -35,7 +38,9 @@ scripts/build-data.ts     API iptv-org + coordenadas do Wikidata -> channels.jso
 scripts/check-streams.ts  health check de todos os streams -> .cache/health.json
 src/globe/GlobeView.tsx   globe.gl + shader dia/noite + camada própria de pontos (THREE.Points)
 src/ui/Player.tsx         hls.js, tentativa de cada fonte, tratamento de falha, zapear
-src/ui/Controls.tsx       busca, filtros, favoritos/histórico, HUD do satélite, tooltip
+src/ui/Sidebar.tsx        painel lateral (busca, zapear, filtros, favoritos, histórico) e a barra recolhida
+src/ui/Search.tsx         busca de canais, com o atalho /
+src/ui/Overlays.tsx       HUD do satélite e tooltip
 ```
 
 ## Relatório dos dados (Fase 0)
