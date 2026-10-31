@@ -156,11 +156,13 @@ export function GlobeView({ world }: { world: WorldData }) {
     };
     refresh();
 
-    // --- animação e auto-rotação ---
+    // --- animação ---
+    // O globo só se mexe quando a pessoa gira: rotação automática atrapalhava o
+    // clique nos canais. A inércia é curta para ele parar logo ao soltar.
     const controls = globe.controls();
-    controls.autoRotate = true;
-    controls.autoRotateSpeed = 0.35;
+    controls.autoRotate = false;
     controls.enableDamping = true;
+    controls.dampingFactor = 0.25;
     let raf = 0;
     let dragging = false;
     const clock = new THREE.Clock();
@@ -170,7 +172,6 @@ export function GlobeView({ world }: { world: WorldData }) {
       mat.uniforms.uHover.value = s.hover ?? -1;
       mat.uniforms.uCurrent.value = s.current ?? -1;
       mat.uniforms.uScale.value = 1050 * Math.min(window.devicePixelRatio, 2) * (window.innerWidth < 700 ? 0.8 : 1);
-      controls.autoRotate = s.current === null && !dragging;
       raf = requestAnimationFrame(loop);
     };
     loop();

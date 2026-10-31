@@ -7,6 +7,11 @@ O formato segue o [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/) e 
 
 ## [Não lançado]
 
+### Alterado
+
+- O globo não gira mais sozinho: ele fica parado e só se move quando a pessoa o gira, o que facilita clicar nos
+  canais. Ao soltar, ele para quase na hora, sem continuar deslizando.
+
 ## [0.1.0] - 2026-10-31
 
 ### Adicionado
