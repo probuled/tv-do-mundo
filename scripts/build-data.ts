@@ -3,8 +3,9 @@
 //
 //   npm run data            (usa cache em .cache/; apague-o para atualizar)
 //
-// Localização: cidade do feed (ct/) > estado (s/) > capital do país (c/ ou o
-// país do canal). Canais no mesmo lugar são espalhados numa espiral.
+// Localização: correção em scripts/overrides.json > cidade do feed (ct/) >
+// estado (s/) > capital do país (c/ ou o país do canal). Canais no mesmo lugar
+// são espalhados numa espiral.
 
 import fs from "node:fs";
 import path from "node:path";
@@ -172,14 +173,58 @@ interface Place {
   level: Level;
   key: string; // código iptv-org
   country: string;
+  state?: string; // código do estado (subdivision), quando conhecido
+  national?: boolean; // cobre o país inteiro; o lugar é a sede
+  coord?: LatLng; // coordenada fixa (cidade fora da lista do iptv-org)
+  name?: string;
 }
+
+// Correções feitas à mão em scripts/overrides.json: o iptv-org marca muitos
+// canais regionais como "país inteiro". Cada entrada diz o estado (e a cidade)
+// de cobertura, ou marca o canal como nacional com a cidade da sede.
+interface Override {
+  state?: string;
+  city?: string;
+  coords?: LatLng;
+  national?: boolean;
+}
+const overrides: Record<string, Override> = JSON.parse(fs.readFileSync(path.resolve("scripts/overrides.json"), "utf8"));
+const fold = (s: string) => s.normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase().trim();
+
+function placeFromOverride(ch: Channel, o: Override): Place {
+  const fail = (why: string): never => {
+    throw new Error(`overrides.json, ${ch.id}: ${why}`);
+  };
+  const national = o.national === true;
+  if (o.state && subBy.get(o.state)?.country !== ch.country) fail(`estado desconhecido "${o.state}"`);
+  if (o.city) {
+    const state = o.state ?? fail("cidade sem estado");
+    if (o.coords) {
+      const key = `${state}:${fold(o.city)}`;
+      return { level: "city", key, country: ch.country, state, national, coord: o.coords, name: o.city };
+    }
+    const found = cities.filter((c) => c.subdivision === state && fold(c.name) === fold(o.city!));
+    if (found.length !== 1) fail(`cidade "${o.city}" não encontrada em ${state} (use "coords")`);
+    return { level: "city", key: found[0].code, country: ch.country, state, national, name: o.city };
+  }
+  if (o.state) return { level: "subdivision", key: o.state, country: ch.country, state: o.state, national };
+  if (!national) fail("sem estado, cidade nem national");
+  return { level: "country", key: ch.country, country: ch.country, national };
+}
+
 function placeOf(ch: Channel): Place {
+  const override = overrides[ch.id];
+  if (override) return placeFromOverride(ch, override);
   const fs_ = (feedsBy.get(ch.id) ?? []).sort((a, b) => Number(b.is_main) - Number(a.is_main));
   const areas = fs_.flatMap((f) => f.broadcast_area);
   const city = areas.find((a) => a.startsWith("ct/") && cityBy.has(a.slice(3)));
-  if (city) return { level: "city", key: city.slice(3), country: cityBy.get(city.slice(3))!.country };
+  if (city) {
+    const c = cityBy.get(city.slice(3))!;
+    return { level: "city", key: c.code, country: c.country, state: c.subdivision ?? undefined };
+  }
   const sub = areas.find((a) => a.startsWith("s/") && subBy.has(a.slice(2)));
-  if (sub) return { level: "subdivision", key: sub.slice(2), country: subBy.get(sub.slice(2))!.country };
+  if (sub)
+    return { level: "subdivision", key: sub.slice(2), country: subBy.get(sub.slice(2))!.country, state: sub.slice(2) };
   const c = areas.find((a) => a.startsWith("c/") && countryBy.has(a.slice(2)) && a.slice(2) === ch.country);
   return { level: "country", key: c ? c.slice(2) : ch.country, country: c ? c.slice(2) : ch.country };
 }
@@ -203,9 +248,30 @@ const countryCoords = await cached("geo-countries.json", async () => {
   return out;
 });
 
-const subKeys = [...new Set(placed.filter((p) => p.place.level === "subdivision").map((p) => p.place.key))];
-const subCoords = await cached("geo-subdivisions.json", () =>
-  batched(subKeys, 200, async (chunk) => {
+// Coordenadas ficam em .cache/; só as chaves que ainda não estão lá vão ao
+// Wikidata (as correções do overrides.json trazem cidades novas). Sem rede,
+// segue com o que já está no cache.
+async function cachedCoords(
+  name: string,
+  keys: string[],
+  fetchMissing: (keys: string[]) => Promise<Record<string, LatLng>>,
+): Promise<Record<string, LatLng>> {
+  const file = path.join(CACHE, name);
+  const have: Record<string, LatLng> = fs.existsSync(file) ? JSON.parse(fs.readFileSync(file, "utf8")) : {};
+  const missing = keys.filter((k) => !(k in have));
+  if (!missing.length) return have;
+  try {
+    Object.assign(have, await fetchMissing(missing));
+    fs.writeFileSync(file, JSON.stringify(have));
+  } catch (e) {
+    console.warn(`${name}: ${missing.length} sem coordenada (${(e as Error).message})`);
+  }
+  return have;
+}
+
+const subKeys = [...new Set(placed.flatMap((p) => (p.place.state ? [p.place.state] : [])))];
+const subCoords = await cachedCoords("geo-subdivisions.json", subKeys, (keys) =>
+  batched(keys, 200, async (chunk) => {
     const rows = await sparql(`
       SELECT ?code (SAMPLE(?coord) AS ?p) WHERE {
         VALUES ?code { ${chunk.map((c) => `"${c}"`).join(" ")} }
@@ -215,12 +281,13 @@ const subCoords = await cached("geo-subdivisions.json", () =>
   }),
 );
 
-const cityKeys = [...new Set(placed.filter((p) => p.place.level === "city").map((p) => p.place.key))];
+const cityKeys = [...new Set(placed.filter((p) => p.place.level === "city" && !p.place.coord).map((p) => p.place.key))];
 const qidToCity = new Map(
   cityKeys.map((k) => [cityBy.get(k)!.wikidata_id, k] as const).filter(([q]) => q && /^Q\d+$/.test(q)),
 );
-const cityCoords = await cached("geo-cities.json", () =>
-  batched([...qidToCity.keys()] as string[], 250, async (chunk) => {
+const cityCoords = await cachedCoords("geo-cities.json", cityKeys, (keys) => {
+  const qids = keys.map((k) => cityBy.get(k)!.wikidata_id).filter((q): q is string => !!q && /^Q\d+$/.test(q));
+  return batched(qids, 250, async (chunk) => {
     const rows = await sparql(`
       SELECT ?c (SAMPLE(?coord) AS ?p) WHERE {
         VALUES ?c { ${chunk.map((q) => `wd:${q}`).join(" ")} }
@@ -233,8 +300,8 @@ const cityCoords = await cached("geo-cities.json", () =>
       if (p && qidToCity.has(q)) out[qidToCity.get(q)!] = p;
     }
     return out;
-  }),
-);
+  });
+});
 
 // o iptv-org usa alguns códigos fora do ISO 3166-1
 const ISO_ALIAS: Record<string, string> = { UK: "GB" };
@@ -242,16 +309,18 @@ const ISO_ALIAS: Record<string, string> = { UK: "GB" };
 // resolve com fallback cidade -> estado -> país
 const levelStats: Record<string, number> = {};
 const groups = new Map<string, { coord: LatLng; level: Level; name: string; items: Channel[] }>();
+const stateOf = new Map<string, string>(); // canal -> estado, só para canais regionais
+const nationalIds = new Set<string>();
 for (const { ch, place } of placed) {
   let level = place.level;
   let coord: LatLng | undefined;
   let key = place.key;
   let name = "";
   if (level === "city") {
-    coord = cityCoords[key];
-    name = cityBy.get(key)!.name;
+    coord = place.coord ?? cityCoords[key];
+    name = place.name ?? cityBy.get(key)!.name;
     if (!coord) {
-      const sub = cityBy.get(key)!.subdivision;
+      const sub = place.state;
       if (sub && subCoords[sub]) {
         level = "subdivision";
         key = sub;
@@ -270,9 +339,13 @@ for (const { ch, place } of placed) {
     name = countryBy.get(key)?.name ?? key;
   }
   if (!coord) continue;
+  if (place.national) nationalIds.add(ch.id);
+  else if (place.state) stateOf.set(ch.id, place.state);
   levelStats[level] = (levelStats[level] ?? 0) + 1;
   const gk = `${level}:${key}`;
   const g = groups.get(gk) ?? groups.set(gk, { coord, level, name, items: [] }).get(gk)!;
+  // o nome escrito no overrides.json tem acento; o do iptv-org às vezes não
+  if (place.name && level === place.level) g.name = place.name;
   g.items.push(ch);
 }
 console.log("canais por nível:", levelStats);
@@ -328,6 +401,8 @@ for (const g of [...groups.values()].sort((a, b) => b.items.length - a.items.len
       ...(langs.length ? { l: langs } : {}),
       ...(main?.timezones?.[0] ? { tz: main.timezones[0] } : {}),
       ...(ch.website ? { w: ch.website } : {}),
+      ...(stateOf.has(ch.id) ? { st: stateOf.get(ch.id) } : {}),
+      ...(nationalIds.has(ch.id) ? { nat: 1 } : {}),
     });
   });
 }
@@ -339,6 +414,8 @@ const data = {
   categories: Object.fromEntries(categories.filter((c) => c.id !== "xxx").map((c) => [c.id, c.name])),
   languages: Object.fromEntries(languages.filter((l) => usedLangs.has(l.code!)).map((l) => [l.code, l.name])),
   places,
+  // nomes dos estados que aparecem no filtro (os do Brasil o app mostra com acento)
+  subdivisions: Object.fromEntries([...new Set(stateOf.values())].sort().map((code) => [code, subBy.get(code)!.name])),
   channels: out,
 };
 fs.mkdirSync(path.dirname(OUT), { recursive: true });
