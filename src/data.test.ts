@@ -1,5 +1,15 @@
 import { describe, expect, it } from "vitest";
-import { catColor, CATEGORY_COLORS, flagCode, localTime, playableStreams, subsolarPoint, type Channel } from "./data";
+import {
+  catColor,
+  CATEGORY_COLORS,
+  flagCode,
+  localTime,
+  placeLabel,
+  playableStreams,
+  subsolarPoint,
+  type Channel,
+  type WorldData,
+} from "./data";
 
 const channel = (s: Channel["s"]): Channel => ({ id: "x", n: "X", c: "BR", cat: [], la: 0, lo: 0, p: 0, s });
 
@@ -65,5 +75,32 @@ describe("localTime", () => {
   it("devolve null para fuso ausente ou inválido", () => {
     expect(localTime(undefined)).toBeNull();
     expect(localTime("Lugar/Inexistente")).toBeNull();
+  });
+});
+
+describe("placeLabel", () => {
+  const world = {
+    places: [
+      { n: "Belém", lv: "ct", la: 0, lo: 0, c: "BR" },
+      { n: "Bahia", lv: "s", la: 0, lo: 0, c: "BR" },
+      { n: "Brazil", lv: "c", la: 0, lo: 0, c: "BR" },
+      { n: "São Paulo", lv: "ct", la: 0, lo: 0, c: "BR" },
+    ],
+    subdivisions: { "BR-BA": "Bahia" },
+  } as unknown as WorldData;
+  const at = (p: number, extra: Partial<Channel> = {}) => ({ ...channel([]), p, ...extra });
+
+  it("mostra a cidade com a sigla do estado, ou o estado com acento", () => {
+    expect(placeLabel(world, at(0, { st: "BR-PA" }))).toBe("Belém (PA)");
+    expect(placeLabel(world, at(1, { st: "BR-BA" }))).toBe("Bahia");
+  });
+
+  it("marca os canais nacionais com a sede, quando conhecida", () => {
+    expect(placeLabel(world, at(3, { nat: 1 }))).toBe("Nacional · sede em São Paulo");
+    expect(placeLabel(world, at(2, { nat: 1 }))).toBe("Nacional");
+  });
+
+  it("não repete o país para canais sem lugar mais preciso", () => {
+    expect(placeLabel(world, at(2))).toBe("");
   });
 });
