@@ -49,11 +49,11 @@ describe("flagCode", () => {
 
 describe("catColor", () => {
   it("usa a primeira categoria com cor conhecida", () => {
-    expect(catColor(["shop", "news"])).toBe(CATEGORY_COLORS.news);
+    expect(catColor(["desconhecida", "news"])).toBe(CATEGORY_COLORS.news);
   });
 
   it("cai na cor de outros quando nenhuma categoria tem cor", () => {
-    expect(catColor(["shop"])).toBe(CATEGORY_COLORS.outros);
+    expect(catColor(["desconhecida"])).toBe(CATEGORY_COLORS.outros);
   });
 });
 

@@ -1,10 +1,12 @@
 import { useEffect, useRef, useState } from "react";
 import Hls from "hls.js";
+import { ExternalLink, Link, LoaderCircle, Shuffle, Star, VolumeX, X } from "lucide-react";
 import { catColor, catName, countryOf, langName, localTime, playableStreams, type WorldData } from "../data";
 import { Flag } from "./Flag";
 import { getState, markFailed, randomChannel, setState, toggleFavorite, tune, useStore } from "../store";
 
 const START_TIMEOUT = 12_000;
+const ICON = { size: 16, strokeWidth: 1.75 } as const;
 
 // Erros do hls.js -> explicação para gente
 function friendly(reason: string) {
@@ -143,30 +145,40 @@ export function Player({ world }: { world: WorldData }) {
   return (
     <aside className="player" aria-label="Player">
       <div className="video-wrap">
-        <video ref={video} playsInline controls muted={muted} onVolumeChange={(e) => setMuted(e.currentTarget.muted)} />
+        <video
+          ref={video}
+          playsInline
+          controls={status.kind === "playing"}
+          muted={muted}
+          onVolumeChange={(e) => setMuted(e.currentTarget.muted)}
+        />
         {status.kind === "loading" && (
           <div className="overlay">
-            <div className="spinner" />
-            <span>Sintonizando{status.total > 1 ? ` (fonte ${status.attempt} de ${status.total})` : ""}…</span>
+            <LoaderCircle className="spin" size={22} strokeWidth={1.75} aria-hidden />
+            <span>Sintonizando{status.total > 1 ? ` (fonte ${status.attempt} de ${status.total})` : ""}</span>
           </div>
         )}
         {status.kind === "failed" && (
           <div className="overlay failed">
             <strong>Canal fora do ar</strong>
             <span className="muted">{status.reason}</span>
-            <button onClick={() => tune(randomChannel())}>Outro canal aleatório</button>
+            <button className="btn btn-sm" onClick={() => tune(randomChannel())}>
+              <Shuffle {...ICON} aria-hidden />
+              Outro canal aleatório
+            </button>
           </div>
         )}
         {needsTap && status.kind === "playing" && (
           <button
-            className="unmute"
+            className="btn btn-sm unmute"
             onClick={() => {
               video.current!.muted = false;
               setMuted(false);
               setNeedsTap(false);
             }}
           >
-            🔇 Toque para ativar o som
+            <VolumeX {...ICON} aria-hidden />
+            Toque para ativar o som
           </button>
         )}
       </div>
@@ -188,44 +200,55 @@ export function Player({ world }: { world: WorldData }) {
             <p>
               <Flag code={ch.c} /> {place && place.lv !== "c" ? `${place.n}, ` : ""}
               {country}
-              {time && <span className="muted"> · {time} hora local</span>}
+              {time && (
+                <span className="muted">
+                  {" "}
+                  · <span className="num">{time}</span> hora local
+                </span>
+              )}
             </p>
           </div>
           <button
-            className={`icon ${fav ? "on" : ""}`}
+            className={`icon-btn ${fav ? "is-fav" : ""}`}
             onClick={() => toggleFavorite(ch.id)}
+            aria-pressed={fav}
             aria-label={fav ? "Remover dos favoritos" : "Favoritar"}
-            title="Favorito"
+            title={fav ? "Remover dos favoritos" : "Favoritar"}
           >
-            {fav ? "★" : "☆"}
+            <Star {...ICON} fill={fav ? "currentColor" : "none"} />
           </button>
           <button
-            className="icon"
+            className="icon-btn"
             onClick={() => setState({ current: null, zapping: false })}
             aria-label="Fechar"
-            title="Fechar"
+            title="Fechar (Esc)"
           >
-            ×
+            <X {...ICON} />
           </button>
         </div>
         <div className="chips">
           {ch.cat.map((c) => (
-            <span key={c} className="chip" style={{ borderColor: catColor([c]) }}>
+            <span key={c} className="chip chip-static" style={{ ["--c" as string]: catColor([c]) }}>
+              <span className="chip-dot" aria-hidden />
               {catName(c, world)}
             </span>
           ))}
           {ch.l?.slice(0, 3).map((l) => (
-            <span key={l} className="chip lang">
+            <span key={l} className="chip chip-static chip-muted">
               {langName(world, l)}
             </span>
           ))}
-          {streamFlags.includes("v") && <span className="chip ok">✓ verificado</span>}
-          {streamFlags.includes("g") && <span className="chip warn">pode ter bloqueio regional</span>}
-          {streamFlags.includes("n") && <span className="chip warn">não é 24h</span>}
+          {streamFlags.includes("v") && <span className="chip chip-static chip-ok">Verificado</span>}
+          {streamFlags.includes("g") && <span className="chip chip-static chip-warn">Pode ter bloqueio regional</span>}
+          {streamFlags.includes("n") && <span className="chip chip-static chip-warn">Não é 24h</span>}
         </div>
         <div className="info-actions">
-          <button onClick={() => tune(randomChannel())}>⤭ Próximo aleatório</button>
+          <button className="btn btn-sm" onClick={() => tune(randomChannel())}>
+            <Shuffle {...ICON} aria-hidden />
+            Próximo aleatório
+          </button>
           <button
+            className="btn btn-sm"
             onClick={() => {
               navigator.clipboard?.writeText(location.href).then(() => {
                 setCopied(true);
@@ -233,11 +256,13 @@ export function Player({ world }: { world: WorldData }) {
               });
             }}
           >
-            {copied ? "Link copiado!" : "🔗 Compartilhar"}
+            <Link {...ICON} aria-hidden />
+            {copied ? "Link copiado" : "Compartilhar"}
           </button>
           {ch.w && (
-            <a href={ch.w} target="_blank" rel="noreferrer">
-              Site ↗
+            <a className="btn btn-sm btn-ghost" href={ch.w} target="_blank" rel="noreferrer">
+              Site
+              <ExternalLink size={14} strokeWidth={1.75} aria-hidden />
             </a>
           )}
         </div>
