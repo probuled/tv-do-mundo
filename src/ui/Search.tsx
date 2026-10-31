@@ -34,10 +34,12 @@ export function SearchBox({ world }: { world: WorldData }) {
     return out.sort((a, b) => starts(b) - starts(a)).slice(0, 10);
   }, [q, index, world]);
 
+  // a lista continua aberta depois de escolher um canal, para dar para testar outro
+  // se este não funcionar; ela só fecha ao apagar o texto (ou no X) e com Esc
   const pick = (i: number) => {
     setState({ zapping: false });
     tune(i);
-    setOpen(false);
+    setActive(Math.max(results.indexOf(i), 0));
   };
 
   return (
@@ -51,7 +53,6 @@ export function SearchBox({ world }: { world: WorldData }) {
         aria-label="Buscar canal"
         autoComplete="off"
         onFocus={() => setOpen(true)}
-        onBlur={() => setTimeout(() => setOpen(false), 150)}
         onChange={(e) => {
           setQ(e.target.value);
           setActive(0);
