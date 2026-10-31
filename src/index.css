@@ -664,10 +664,14 @@ button.chip:hover {
 
 .sidebar-footer {
   display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 10px;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 8px;
   padding: 16px;
   border-top: 1px solid var(--border);
+}
+
+.sidebar-footer .btn {
+  padding: 0 8px;
 }
 
 /* ---------- painel recolhido ---------- */
@@ -1029,6 +1033,39 @@ button.chip:hover {
 .modal-card b {
   color: var(--text);
   font-weight: 600;
+}
+
+.modal-card h3 {
+  margin: 16px 0 6px;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text);
+}
+
+.signal-list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  gap: 10px;
+}
+
+.signal-list li {
+  padding: 10px 12px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+}
+
+.signal-list q {
+  display: block;
+  margin-bottom: 4px;
+  color: var(--text);
+  font-weight: 600;
+  quotes: none;
+}
+
+.signal-list p {
+  margin: 0;
 }
 
 .modal-card .close {
