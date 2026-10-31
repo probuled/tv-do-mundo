@@ -88,15 +88,15 @@ rejeitadas no review.
 
 ## 3. Travas automáticas
 
-| Momento  | Hook / Workflow                         | Checa                                                        |
-| -------- | --------------------------------------- | ------------------------------------------------------------ |
-| commit   | `pre-commit` → `npx lint-staged`        | oxlint `--fix` + Prettier nos arquivos alterados             |
-| commit   | `commit-msg` → `npx --no -- commitlint` | Formato da mensagem                                          |
-| push     | `pre-push` → `npx validate-branch-name` | Nome da branch e typecheck                                   |
-| PR       | `ci.yml`                                | lint · format · typecheck · test · build · `docker build`    |
-| PR       | `pr-title.yml`                          | Título do PR em Conventional Commits, até 66 caracteres      |
-| PR       | `commitlint.yml`                        | Todos os commits do PR                                       |
-| tag `v*` | `release.yml`                           | Imagem em `ghcr.io/luanmvcosta0/tv-do-mundo:X.Y.Z` + Release |
+| Momento  | Hook / Workflow                         | Checa                                                     |
+| -------- | --------------------------------------- | --------------------------------------------------------- |
+| commit   | `pre-commit` → `npx lint-staged`        | oxlint `--fix` + Prettier nos arquivos alterados          |
+| commit   | `commit-msg` → `npx --no -- commitlint` | Formato da mensagem                                       |
+| push     | `pre-push` → `npx validate-branch-name` | Nome da branch e typecheck                                |
+| PR       | `ci.yml`                                | lint · format · typecheck · test · build · `docker build` |
+| PR       | `pr-title.yml`                          | Título do PR em Conventional Commits, até 66 caracteres   |
+| PR       | `commitlint.yml`                        | Todos os commits do PR                                    |
+| tag `v*` | `release.yml`                           | Imagem em `ghcr.io/probuled/tv-do-mundo:X.Y.Z` + Release  |
 
 A configuração está em `commitlint.config.mjs`, `.husky/`, `.github/workflows/` e nas chaves `lint-staged` e
 `validate-branch-name` do `package.json`.
