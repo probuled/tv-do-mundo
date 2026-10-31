@@ -7,6 +7,18 @@ O formato segue o [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/) e 
 
 ## [Não lançado]
 
+### Adicionado
+
+- Filtro "Estado", que aparece ao escolher um país: lista os estados com canais e a opção "Nacionais e sem estado".
+- A busca também encontra canais pelo nome do estado (por exemplo "Bahia" ou "Pará").
+
+### Alterado
+
+- Canais brasileiros regionais que a lista do iptv-org marcava como "Brasil inteiro" agora ficam no estado (e na
+  cidade) onde são transmitidos. As redes nacionais ficam na cidade da sede e aparecem no player como "Nacional ·
+  sede em São Paulo". O ponto central do Brasil, em Brasília, cai de 207 para 100 canais.
+- O player mostra a sigla do estado ao lado da cidade, por exemplo "Belém (PA)".
+
 ### Corrigido
 
 - O player passa a mostrar a cidade dos canais locais (por exemplo "Natal" e "Fortaleza"). Os dados marcavam as

@@ -1,7 +1,7 @@
 import { useMemo, useState } from "react";
 import { ChevronDown, Info, Layers, PanelLeftClose, PanelLeftOpen, Shuffle, Square } from "lucide-react";
-import { CATEGORY_COLORS, catName, countryOf, langName, type WorldData } from "../data";
-import { getState, matchesFilters, randomChannel, setState, tune, useStore } from "../store";
+import { CATEGORY_COLORS, catName, countryOf, langName, stateName, type WorldData } from "../data";
+import { EMPTY_FILTERS, getState, matchesFilters, NO_STATE, randomChannel, setState, tune, useStore } from "../store";
 import { ChannelRow } from "./ChannelRow";
 import { GithubButton } from "./GithubButton";
 import { Logo } from "./Logo";
@@ -112,6 +112,25 @@ export function Sidebar({ world, onAbout }: { world: WorldData; onAbout: () => v
       .sort((a, b) => a.label.localeCompare(b.label));
   }, [world]);
 
+  // estados do país escolhido, com a contagem; quem não tem estado vai para "Nacionais e sem estado"
+  const states = useMemo(() => {
+    if (!filters.country) return [];
+    const c = new Map<string, number>();
+    let none = 0;
+    for (const ch of world.channels) {
+      if (ch.c !== filters.country) continue;
+      if (ch.st) c.set(ch.st, (c.get(ch.st) ?? 0) + 1);
+      else none++;
+    }
+    if (!c.size) return [];
+    return [
+      ...[...c]
+        .map(([code, n]) => ({ value: code, label: `${stateName(world, code)} (${fmt(n)})` }))
+        .sort((a, b) => a.label.localeCompare(b.label, "pt-BR")),
+      ...(none ? [{ value: NO_STATE, label: `Nacionais e sem estado (${fmt(none)})` }] : []),
+    ];
+  }, [world, filters.country]);
+
   const setF = (patch: Partial<typeof filters>) => setState({ filters: { ...getState().filters, ...patch } });
   const toggleCat = (c: string) =>
     setF({
@@ -119,7 +138,8 @@ export function Sidebar({ world, onAbout }: { world: WorldData; onAbout: () => v
         ? filters.categories.filter((x) => x !== c)
         : [...filters.categories, c],
     });
-  const hasFilters = filters.categories.length > 0 || filters.language || filters.country || filters.verifiedOnly;
+  const hasFilters =
+    filters.categories.length > 0 || filters.language || filters.country || filters.state || filters.verifiedOnly;
   const list = tab === "favorites" ? favorites : history;
 
   return (
@@ -200,10 +220,18 @@ export function Sidebar({ world, onAbout }: { world: WorldData; onAbout: () => v
               <Select
                 label="País"
                 value={filters.country ?? ""}
-                onChange={(v) => setF({ country: v || null })}
+                onChange={(v) => setF({ country: v || null, state: null })}
                 options={countries}
               />
             </div>
+            {states.length > 0 && (
+              <Select
+                label="Estado"
+                value={filters.state ?? ""}
+                onChange={(v) => setF({ state: v || null })}
+                options={states}
+              />
+            )}
             {world.checkedAt && (
               <label className="switch">
                 <input
@@ -234,10 +262,7 @@ export function Sidebar({ world, onAbout }: { world: WorldData; onAbout: () => v
               </div>
             </div>
             {hasFilters && (
-              <button
-                className="btn btn-ghost"
-                onClick={() => setF({ categories: [], language: null, country: null, verifiedOnly: false })}
-              >
+              <button className="btn btn-ghost" onClick={() => setF(EMPTY_FILTERS)}>
                 Limpar filtros
               </button>
             )}

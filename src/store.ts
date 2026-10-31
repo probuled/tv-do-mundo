@@ -5,8 +5,18 @@ export interface Filters {
   categories: string[]; // vazio = todas
   language: string | null;
   country: string | null;
+  state: string | null; // código do estado, ou NO_STATE (nacionais e sem estado); só com país escolhido
   verifiedOnly: boolean;
 }
+
+export const NO_STATE = "-";
+export const EMPTY_FILTERS: Filters = {
+  categories: [],
+  language: null,
+  country: null,
+  state: null,
+  verifiedOnly: false,
+};
 
 export interface State {
   world: WorldData | null;
@@ -47,7 +57,7 @@ let state: State = {
   spy: false,
   // aberta por padrão em telas largas; depois vale a última escolha da pessoa
   sidebarOpen: load("tvm:sidebar", (globalThis.innerWidth ?? 1280) >= 900),
-  filters: { categories: [], language: null, country: null, verifiedOnly: false },
+  filters: EMPTY_FILTERS,
   failed: new Set(),
   favorites: load("tvm:favorites", []),
   history: load("tvm:history", []),
@@ -75,6 +85,7 @@ export function matchesFilters(i: number, s: State = state): boolean {
   if (f.categories.length && !ch.cat.some((c) => f.categories.includes(c))) return false;
   if (f.language && !ch.l?.includes(f.language)) return false;
   if (f.country && ch.c !== f.country) return false;
+  if (f.state && (f.state === NO_STATE ? ch.st !== undefined : ch.st !== f.state)) return false;
   if (f.verifiedOnly && !ch.s.some(([, , fl]) => fl.includes("v"))) return false;
   if (isSecurePage() && !ch.s.some(([u]) => u.startsWith("https:"))) return false;
   return true;
