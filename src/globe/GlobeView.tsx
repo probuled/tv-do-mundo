@@ -85,7 +85,7 @@ export function GlobeView({ world }: { world: WorldData }) {
     const globe = new Globe(container, { rendererConfig: { antialias: true, powerPreference: "high-performance" } })
       .width(container.clientWidth)
       .height(container.clientHeight)
-      .backgroundImageUrl(TEX + "night-sky.png")
+      .backgroundColor("#050608")
       .showAtmosphere(true)
       .atmosphereColor("#5ec8ff")
       .atmosphereAltitude(0.17)
@@ -251,13 +251,15 @@ export function GlobeView({ world }: { world: WorldData }) {
     };
     api.current = { fly, refresh };
 
-    const onResize = () => globe.width(container.clientWidth).height(container.clientHeight);
-    window.addEventListener("resize", onResize);
+    // O container encolhe quando o painel lateral abre: observar ele (e não só a
+    // janela) mantém o globo centralizado no espaço livre.
+    const resizer = new ResizeObserver(() => globe.width(container.clientWidth).height(container.clientHeight));
+    resizer.observe(container);
 
     return () => {
       cancelAnimationFrame(raf);
       clearInterval(sunTimer);
-      window.removeEventListener("resize", onResize);
+      resizer.disconnect();
       canvas.removeEventListener("pointermove", onMove);
       canvas.removeEventListener("pointerdown", onDown);
       canvas.removeEventListener("pointerup", onUp);

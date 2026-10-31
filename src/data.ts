@@ -41,25 +41,48 @@ export async function loadWorld(): Promise<WorldData> {
   return res.json();
 }
 
-// Cores por categoria (as que não estão aqui usam "outros").
+// Paleta discreta de seis tons, repetida na ordem das categorias mais comuns.
+// Os pontos do globo e os chips da barra lateral usam as mesmas cores.
+const PALETTE = {
+  blue: "#6ea8f5",
+  salmon: "#ef8a6f",
+  purple: "#b38cf0",
+  green: "#5ccf96",
+  amber: "#efbf5e",
+  pink: "#ef7fa3",
+};
+
 export const CATEGORY_COLORS: Record<string, string> = {
-  news: "#ff5a5f",
-  sports: "#3ddc84",
-  music: "#e056fd",
-  kids: "#ffd43b",
-  animation: "#ffd43b",
-  movies: "#9775fa",
-  series: "#9775fa",
-  entertainment: "#ff922b",
-  religious: "#f8f0e3",
-  documentary: "#63e6be",
-  education: "#4dabf7",
-  science: "#4dabf7",
-  business: "#74c0fc",
-  culture: "#f783ac",
-  general: "#22d3ee",
-  legislative: "#ced4da",
-  outros: "#a5d8ff",
+  general: PALETTE.blue,
+  news: PALETTE.salmon,
+  religious: PALETTE.purple,
+  entertainment: PALETTE.green,
+  music: PALETTE.amber,
+  movies: PALETTE.pink,
+  series: PALETTE.blue,
+  sports: PALETTE.salmon,
+  kids: PALETTE.purple,
+  education: PALETTE.green,
+  culture: PALETTE.amber,
+  documentary: PALETTE.pink,
+  legislative: PALETTE.blue,
+  comedy: PALETTE.salmon,
+  lifestyle: PALETTE.purple,
+  animation: PALETTE.green,
+  classic: PALETTE.amber,
+  shop: PALETTE.pink,
+  outdoor: PALETTE.blue,
+  business: PALETTE.salmon,
+  travel: PALETTE.purple,
+  cooking: PALETTE.green,
+  family: PALETTE.amber,
+  public: PALETTE.pink,
+  auto: PALETTE.blue,
+  weather: PALETTE.salmon,
+  science: PALETTE.purple,
+  relax: PALETTE.green,
+  interactive: PALETTE.amber,
+  outros: "#8fa3bd",
 };
 
 // Nomes em português das categorias do iptv-org
