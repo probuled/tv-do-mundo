@@ -15,6 +15,8 @@ export interface Channel {
   l?: string[]; // idiomas
   tz?: string; // fuso horário
   w?: string; // site
+  st?: string; // estado de cobertura (código ISO 3166-2, ex.: "BR-PA"), só em canais regionais
+  nat?: 1; // canal nacional: cobre o país inteiro e fica na cidade da sede
 }
 
 export interface Place {
@@ -32,6 +34,7 @@ export interface WorldData {
   categories: Record<string, string>;
   languages: Record<string, string>;
   places: Place[];
+  subdivisions?: Record<string, string>; // nome dos estados usados em "st"
   channels: Channel[];
 }
 
@@ -184,3 +187,51 @@ const score = ([, , f]: StreamTuple) => (f.includes("v") ? 2 : 0) + (f.includes(
 
 // Código para o flag-icons (o iptv-org usa UK em vez de GB).
 export const flagCode = (code: string) => (code === "UK" ? "gb" : code.toLowerCase());
+
+// Estados do Brasil com acento; os nomes do iptv-org vêm sem ("Sao Paulo").
+const BR_STATES: Record<string, string> = {
+  "BR-AC": "Acre",
+  "BR-AL": "Alagoas",
+  "BR-AM": "Amazonas",
+  "BR-AP": "Amapá",
+  "BR-BA": "Bahia",
+  "BR-CE": "Ceará",
+  "BR-DF": "Distrito Federal",
+  "BR-ES": "Espírito Santo",
+  "BR-GO": "Goiás",
+  "BR-MA": "Maranhão",
+  "BR-MG": "Minas Gerais",
+  "BR-MS": "Mato Grosso do Sul",
+  "BR-MT": "Mato Grosso",
+  "BR-PA": "Pará",
+  "BR-PB": "Paraíba",
+  "BR-PE": "Pernambuco",
+  "BR-PI": "Piauí",
+  "BR-PR": "Paraná",
+  "BR-RJ": "Rio de Janeiro",
+  "BR-RN": "Rio Grande do Norte",
+  "BR-RO": "Rondônia",
+  "BR-RR": "Roraima",
+  "BR-RS": "Rio Grande do Sul",
+  "BR-SC": "Santa Catarina",
+  "BR-SE": "Sergipe",
+  "BR-SP": "São Paulo",
+  "BR-TO": "Tocantins",
+};
+
+export const stateName = (w: WorldData, code: string) => BR_STATES[code] ?? w.subdivisions?.[code] ?? code;
+
+// Onde o canal está, para a linha abaixo do nome no player (sem o país).
+// Ex.: "Belém (PA)", "Bahia", "Nacional · sede em São Paulo", "Nacional" ou "".
+export function placeLabel(w: WorldData, ch: Channel): string {
+  const place = w.places[ch.p];
+  let where = "";
+  if (place?.lv === "ct") {
+    const uf = ch.st?.startsWith("BR-") ? ch.st.slice(3) : "";
+    where = uf ? `${place.n} (${uf})` : place.n;
+  } else if (place?.lv === "s") {
+    where = ch.st ? stateName(w, ch.st) : place.n;
+  }
+  if (ch.nat) return where ? `Nacional · sede em ${where}` : "Nacional";
+  return where;
+}

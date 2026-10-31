@@ -1,6 +1,6 @@
 import { useMemo, useState } from "react";
 import { Search } from "lucide-react";
-import { countryOf, type WorldData } from "../data";
+import { countryOf, placeLabel, stateName, type WorldData } from "../data";
 import { setState, tune } from "../store";
 import { ChannelRow } from "./ChannelRow";
 
@@ -16,7 +16,7 @@ export function SearchBox({ world }: { world: WorldData }) {
     () =>
       world.channels.map((ch) =>
         strip(
-          `${ch.n} ${countryOf(world, ch.c)[0]} ${world.countries[ch.c]?.[0] ?? ""} ${world.places[ch.p]?.n ?? ""} ${ch.id}`,
+          `${ch.n} ${countryOf(world, ch.c)[0]} ${world.countries[ch.c]?.[0] ?? ""} ${placeLabel(world, ch)} ${ch.st ? stateName(world, ch.st) : ""} ${ch.id}`,
         ),
       ),
     [world],

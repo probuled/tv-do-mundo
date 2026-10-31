@@ -1,7 +1,16 @@
 import { useEffect, useRef, useState } from "react";
 import Hls from "hls.js";
 import { ExternalLink, Link, LoaderCircle, Shuffle, Star, VolumeX, X } from "lucide-react";
-import { catColor, catName, countryOf, langName, localTime, playableStreams, type WorldData } from "../data";
+import {
+  catColor,
+  catName,
+  countryOf,
+  langName,
+  localTime,
+  placeLabel,
+  playableStreams,
+  type WorldData,
+} from "../data";
 import { Flag } from "./Flag";
 import { getState, markFailed, randomChannel, setState, toggleFavorite, tune, useStore } from "../store";
 
@@ -137,7 +146,7 @@ export function Player({ world }: { world: WorldData }) {
   if (current === null) return null;
   const ch = world.channels[current];
   const [country] = countryOf(world, ch.c);
-  const place = world.places[ch.p];
+  const where = placeLabel(world, ch);
   const time = localTime(ch.tz, now);
   const fav = favorites.includes(ch.id);
   const streamFlags = playableStreams(ch)[0]?.[2] ?? "";
@@ -198,7 +207,7 @@ export function Player({ world }: { world: WorldData }) {
           <div className="titles">
             <h2>{ch.n}</h2>
             <p>
-              <Flag code={ch.c} /> {place && place.lv !== "c" ? `${place.n}, ` : ""}
+              <Flag code={ch.c} /> {where ? `${where}, ` : ""}
               {country}
               {time && (
                 <span className="muted">

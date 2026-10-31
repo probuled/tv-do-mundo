@@ -1,6 +1,6 @@
 import { beforeEach, describe, expect, it } from "vitest";
 import type { Channel, WorldData } from "./data";
-import { getState, markFailed, matchesFilters, randomChannel, setState } from "./store";
+import { EMPTY_FILTERS, getState, markFailed, matchesFilters, NO_STATE, randomChannel, setState } from "./store";
 
 const ch = (id: string, extra: Partial<Channel>): Channel => ({
   id,
@@ -24,7 +24,7 @@ const world: WorldData = {
   channels: [
     ch("news.br", { cat: ["news"], l: ["por"] }),
     ch("sports.ar", { c: "AR", cat: ["sports"], l: ["spa"], s: [["https://y.m3u8", "", "v"]] }),
-    ch("music.br", { cat: ["music"], l: ["por"] }),
+    ch("music.br", { cat: ["music"], l: ["por"], st: "BR-BA" }),
   ],
 };
 
@@ -33,7 +33,7 @@ beforeEach(() => {
     world,
     current: null,
     failed: new Set(),
-    filters: { categories: [], language: null, country: null, verifiedOnly: false },
+    filters: EMPTY_FILTERS,
   });
 });
 
@@ -43,17 +43,27 @@ describe("matchesFilters", () => {
   });
 
   it("filtra por categoria, idioma, país e verificados", () => {
-    setState({ filters: { categories: ["news", "music"], language: null, country: null, verifiedOnly: false } });
+    setState({ filters: { ...EMPTY_FILTERS, categories: ["news", "music"] } });
     expect([0, 1, 2].map((i) => matchesFilters(i))).toEqual([true, false, true]);
 
-    setState({ filters: { categories: [], language: "spa", country: null, verifiedOnly: false } });
+    setState({ filters: { ...EMPTY_FILTERS, language: "spa" } });
     expect([0, 1, 2].map((i) => matchesFilters(i))).toEqual([false, true, false]);
 
-    setState({ filters: { categories: [], language: null, country: "BR", verifiedOnly: false } });
+    setState({ filters: { ...EMPTY_FILTERS, country: "BR" } });
     expect([0, 1, 2].map((i) => matchesFilters(i))).toEqual([true, false, true]);
 
-    setState({ filters: { categories: [], language: null, country: null, verifiedOnly: true } });
+    setState({ filters: { ...EMPTY_FILTERS, verifiedOnly: true } });
     expect([0, 1, 2].map((i) => matchesFilters(i))).toEqual([false, true, false]);
+  });
+});
+
+describe("filtro de estado", () => {
+  it("mostra só o estado escolhido, ou só os canais sem estado", () => {
+    setState({ filters: { ...EMPTY_FILTERS, country: "BR", state: "BR-BA" } });
+    expect([0, 1, 2].map((i) => matchesFilters(i))).toEqual([false, false, true]);
+
+    setState({ filters: { ...EMPTY_FILTERS, country: "BR", state: NO_STATE } });
+    expect([0, 1, 2].map((i) => matchesFilters(i))).toEqual([true, false, false]);
   });
 });
 
