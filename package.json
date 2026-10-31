@@ -1,7 +1,7 @@
 {
   "name": "tv-do-mundo",
   "private": true,
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Globo 3D para assistir TV aberta ao vivo de qualquer lugar do mundo.",
   "type": "module",
   "scripts": {
