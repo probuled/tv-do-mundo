@@ -16,7 +16,7 @@ O formato segue o [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/) e 
 
 - Canais brasileiros regionais que a lista do iptv-org marcava como "Brasil inteiro" agora ficam no estado (e na
   cidade) onde são transmitidos. As redes nacionais ficam na cidade da sede e aparecem no player como "Nacional ·
-  sede em São Paulo". O ponto central do Brasil, em Brasília, cai de 207 para 100 canais.
+  sede em São Paulo". O ponto central do Brasil, em Brasília, cai de 207 para 91 canais.
 - O player mostra a sigla do estado ao lado da cidade, por exemplo "Belém (PA)".
 
 ### Corrigido
