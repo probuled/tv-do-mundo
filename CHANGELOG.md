@@ -7,6 +7,10 @@ O formato segue o [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/) e 
 
 ## [Não lançado]
 
+### Adicionado
+
+- Botão "Fora do ar?" também no card do player, ao lado de Próximo aleatório e Compartilhar.
+
 ## [0.5.0] - 2026-10-31
 
 ### Adicionado
