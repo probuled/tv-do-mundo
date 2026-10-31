@@ -43,7 +43,7 @@ jobs:
         run: |
           awk -v v="${{ steps.version.outputs.version }}" '
             $0 ~ "^## \\[" v "\\]" { on = 1; next }
-            on && /^## \[/ { exit }
+            on && /^(## )?\[/ { exit }
             on { print }
           ' CHANGELOG.md > release-notes.md
       - uses: softprops/action-gh-release@v2
