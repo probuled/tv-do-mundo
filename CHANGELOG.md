@@ -7,6 +7,11 @@ O formato segue o [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/) e 
 
 ## [Não lançado]
 
+### Corrigido
+
+- O player passa a mostrar a cidade dos canais locais (por exemplo "Natal" e "Fortaleza"). Os dados marcavam as
+  cidades como país e o nome delas não aparecia.
+
 ## [0.3.0] - 2026-10-31
 
 ### Adicionado
