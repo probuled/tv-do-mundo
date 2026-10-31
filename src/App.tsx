@@ -7,6 +7,7 @@ import { Player } from "./ui/Player";
 import { CollapsedBar, Sidebar } from "./ui/Sidebar";
 import { Hud, Tooltip } from "./ui/Overlays";
 import { Logo } from "./ui/Logo";
+import { REPO_URL } from "./ui/GithubButton";
 import { SEARCH_INPUT_ID } from "./ui/Search";
 
 export default function App() {
@@ -108,7 +109,12 @@ function About({ world, onClose }: { world: WorldData; onClose: () => void }) {
           Marble). Este site não hospeda nem retransmite vídeo: o player toca a URL original de cada emissora, que pode
           estar fora do ar ou bloqueada na sua região. Canais adultos são excluídos.
         </p>
-        <p className="muted">Versão {__APP_VERSION__}</p>
+        <p className="muted">
+          Versão {__APP_VERSION__} · Código aberto no{" "}
+          <a href={REPO_URL} target="_blank" rel="noreferrer">
+            GitHub
+          </a>
+        </p>
       </div>
     </div>
   );

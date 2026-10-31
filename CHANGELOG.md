@@ -7,6 +7,11 @@ O formato segue o [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/) e 
 
 ## [Não lançado]
 
+### Adicionado
+
+- Botão do GitHub no topo do painel (e na barra do painel recolhido) que abre o repositório do projeto, com o
+  mesmo link na janela "Sobre".
+
 ## [0.2.0] - 2026-10-31
 
 ### Alterado
