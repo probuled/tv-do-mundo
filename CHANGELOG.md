@@ -7,6 +7,11 @@ O formato segue o [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/) e 
 
 ## [Não lançado]
 
+### Corrigido
+
+- A lista da busca não some mais ao escolher um canal: dá para testar outros resultados até achar um que funcione.
+  Ela só fecha ao apagar o texto, no X ou com Esc.
+
 ## [0.4.0] - 2026-10-31
 
 ### Adicionado
