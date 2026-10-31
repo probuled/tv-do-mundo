@@ -63,5 +63,6 @@
   "repository": {
     "type": "git",
     "url": "https://github.com/probuled/tv-do-mundo.git"
-  }
+  },
+  "homepage": "https://tv-do-mundo.probuled.workers.dev/"
 }
