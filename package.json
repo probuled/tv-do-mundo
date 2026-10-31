@@ -1,7 +1,7 @@
 {
   "name": "tv-do-mundo",
   "private": true,
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Globo 3D para assistir TV aberta ao vivo de qualquer lugar do mundo.",
   "type": "module",
   "scripts": {
@@ -18,9 +18,12 @@
     "prepare": "husky"
   },
   "dependencies": {
+    "@fontsource-variable/geist": "^5.3.0",
+    "@fontsource-variable/geist-mono": "^5.3.0",
     "flag-icons": "^7.6.0",
     "globe.gl": "^2.46.2",
     "hls.js": "^1.7.4",
+    "lucide-react": "^1.65.0",
     "react": "^19.3.1",
     "react-dom": "^19.3.1",
     "three": "^0.187.0"
@@ -60,5 +63,6 @@
   "repository": {
     "type": "git",
     "url": "https://github.com/probuled/tv-do-mundo.git"
-  }
+  },
+  "homepage": "https://tv-do-mundo.probuled.workers.dev/"
 }

@@ -85,7 +85,7 @@ export function GlobeView({ world }: { world: WorldData }) {
     const globe = new Globe(container, { rendererConfig: { antialias: true, powerPreference: "high-performance" } })
       .width(container.clientWidth)
       .height(container.clientHeight)
-      .backgroundImageUrl(TEX + "night-sky.png")
+      .backgroundColor("#050608")
       .showAtmosphere(true)
       .atmosphereColor("#5ec8ff")
       .atmosphereAltitude(0.17)
@@ -156,11 +156,13 @@ export function GlobeView({ world }: { world: WorldData }) {
     };
     refresh();
 
-    // --- animação e auto-rotação ---
+    // --- animação ---
+    // O globo só se mexe quando a pessoa gira: rotação automática atrapalhava o
+    // clique nos canais. A inércia é curta para ele parar logo ao soltar.
     const controls = globe.controls();
-    controls.autoRotate = true;
-    controls.autoRotateSpeed = 0.35;
+    controls.autoRotate = false;
     controls.enableDamping = true;
+    controls.dampingFactor = 0.25;
     let raf = 0;
     let dragging = false;
     const clock = new THREE.Clock();
@@ -170,7 +172,6 @@ export function GlobeView({ world }: { world: WorldData }) {
       mat.uniforms.uHover.value = s.hover ?? -1;
       mat.uniforms.uCurrent.value = s.current ?? -1;
       mat.uniforms.uScale.value = 1050 * Math.min(window.devicePixelRatio, 2) * (window.innerWidth < 700 ? 0.8 : 1);
-      controls.autoRotate = s.current === null && !dragging;
       raf = requestAnimationFrame(loop);
     };
     loop();
@@ -250,13 +251,15 @@ export function GlobeView({ world }: { world: WorldData }) {
     };
     api.current = { fly, refresh };
 
-    const onResize = () => globe.width(container.clientWidth).height(container.clientHeight);
-    window.addEventListener("resize", onResize);
+    // O container encolhe quando o painel lateral abre: observar ele (e não só a
+    // janela) mantém o globo centralizado no espaço livre.
+    const resizer = new ResizeObserver(() => globe.width(container.clientWidth).height(container.clientHeight));
+    resizer.observe(container);
 
     return () => {
       cancelAnimationFrame(raf);
       clearInterval(sunTimer);
-      window.removeEventListener("resize", onResize);
+      resizer.disconnect();
       canvas.removeEventListener("pointermove", onMove);
       canvas.removeEventListener("pointerdown", onDown);
       canvas.removeEventListener("pointerup", onUp);
