@@ -7,6 +7,8 @@ O formato segue o [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/) e 
 
 ## [Não lançado]
 
+## [0.5.0] - 2026-10-31
+
 ### Adicionado
 
 - Botão "Fora do ar?" ao lado de Satélite e Sobre, com uma janela que explica cada mensagem de "Canal fora do ar"
@@ -76,7 +78,8 @@ O formato segue o [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/) e 
 - Scripts para gerar os dados (`npm run data`) e testar todos os streams (`npm run check`).
 - Imagem Docker com nginx e fluxo de versionamento com Git Flow, Conventional Commits e CI.
 
-[Não lançado]: https://github.com/probuled/tv-do-mundo/compare/v0.4.0...HEAD
+[Não lançado]: https://github.com/probuled/tv-do-mundo/compare/v0.5.0...HEAD
+[0.5.0]: https://github.com/probuled/tv-do-mundo/compare/v0.4.0...v0.5.0
 [0.4.0]: https://github.com/probuled/tv-do-mundo/compare/v0.3.0...v0.4.0
 [0.3.0]: https://github.com/probuled/tv-do-mundo/compare/v0.2.0...v0.3.0
 [0.2.0]: https://github.com/probuled/tv-do-mundo/compare/v0.1.0...v0.2.0
