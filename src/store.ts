@@ -15,6 +15,7 @@ export interface State {
   zapping: boolean;
   zapSeconds: number;
   spy: boolean; // visual "satélite espião"
+  sidebarOpen: boolean;
   filters: Filters;
   failed: Set<string>; // ids de canais que falharam nesta sessão
   favorites: string[];
@@ -44,6 +45,8 @@ let state: State = {
   zapping: false,
   zapSeconds: 25,
   spy: false,
+  // aberta por padrão em telas largas; depois vale a última escolha da pessoa
+  sidebarOpen: load("tvm:sidebar", (globalThis.innerWidth ?? 1280) >= 900),
   filters: { categories: [], language: null, country: null, verifiedOnly: false },
   failed: new Set(),
   favorites: load("tvm:favorites", []),
@@ -56,6 +59,7 @@ export function setState(patch: Partial<State>) {
   state = { ...state, ...patch };
   if (patch.favorites) save("tvm:favorites", patch.favorites);
   if (patch.history) save("tvm:history", patch.history);
+  if (patch.sidebarOpen !== undefined) save("tvm:sidebar", patch.sidebarOpen);
   listeners.forEach((l) => l());
 }
 const subscribe = (l: () => void) => {

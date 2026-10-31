@@ -18,9 +18,12 @@
     "prepare": "husky"
   },
   "dependencies": {
+    "@fontsource-variable/geist": "^5.3.0",
+    "@fontsource-variable/geist-mono": "^5.3.0",
     "flag-icons": "^7.6.0",
     "globe.gl": "^2.46.2",
     "hls.js": "^1.7.4",
+    "lucide-react": "^1.65.0",
     "react": "^19.3.1",
     "react-dom": "^19.3.1",
     "three": "^0.187.0"
