@@ -1,5 +1,5 @@
 import { useMemo, useState } from "react";
-import { ChevronDown, Info, Layers, PanelLeftClose, PanelLeftOpen, Shuffle, Square } from "lucide-react";
+import { ChevronDown, Info, Layers, PanelLeftClose, PanelLeftOpen, RadioTower, Shuffle, Square } from "lucide-react";
 import { CATEGORY_COLORS, catName, countryOf, langName, stateName, type WorldData } from "../data";
 import { EMPTY_FILTERS, getState, matchesFilters, NO_STATE, randomChannel, setState, tune, useStore } from "../store";
 import { ChannelRow } from "./ChannelRow";
@@ -44,6 +44,15 @@ export function AboutButton({ compact, onClick }: { compact?: boolean; onClick: 
   );
 }
 
+export function SignalButton({ compact, onClick }: { compact?: boolean; onClick: () => void }) {
+  return (
+    <button className={`btn ${compact ? "btn-sm" : ""}`} title="Por que um canal fica fora do ar" onClick={onClick}>
+      <RadioTower {...ICON} aria-hidden />
+      Fora do ar?
+    </button>
+  );
+}
+
 function Select({
   label,
   value,
@@ -73,7 +82,7 @@ function Select({
   );
 }
 
-export function Sidebar({ world, onAbout }: { world: WorldData; onAbout: () => void }) {
+export function Sidebar({ world, onAbout, onSignal }: { world: WorldData; onAbout: () => void; onSignal: () => void }) {
   const filters = useStore((s) => s.filters);
   const zapping = useStore((s) => s.zapping);
   const zapSeconds = useStore((s) => s.zapSeconds);
@@ -296,14 +305,23 @@ export function Sidebar({ world, onAbout }: { world: WorldData; onAbout: () => v
 
       <footer className="sidebar-footer">
         <SpyButton />
+        <SignalButton onClick={onSignal} />
         <AboutButton onClick={onAbout} />
       </footer>
     </aside>
   );
 }
 
-// Com o painel recolhido: marca, zapear e GitHub à esquerda; busca, Satélite e Sobre à direita.
-export function CollapsedBar({ world, onAbout }: { world: WorldData; onAbout: () => void }) {
+// Com o painel recolhido: marca, zapear e GitHub à esquerda; busca, Satélite, Fora do ar? e Sobre à direita.
+export function CollapsedBar({
+  world,
+  onAbout,
+  onSignal,
+}: {
+  world: WorldData;
+  onAbout: () => void;
+  onSignal: () => void;
+}) {
   const zapping = useStore((s) => s.zapping);
   return (
     <>
@@ -334,6 +352,7 @@ export function CollapsedBar({ world, onAbout }: { world: WorldData; onAbout: ()
       <div className="mini-bar mini-right">
         <SearchBox world={world} />
         <SpyButton compact />
+        <SignalButton compact onClick={onSignal} />
         <AboutButton compact onClick={onAbout} />
       </div>
     </>
