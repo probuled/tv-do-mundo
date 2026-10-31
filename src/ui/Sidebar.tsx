@@ -3,6 +3,7 @@ import { ChevronDown, Info, Layers, PanelLeftClose, PanelLeftOpen, Shuffle, Squa
 import { CATEGORY_COLORS, catName, countryOf, langName, type WorldData } from "../data";
 import { getState, matchesFilters, randomChannel, setState, tune, useStore } from "../store";
 import { ChannelRow } from "./ChannelRow";
+import { GithubButton } from "./GithubButton";
 import { Logo } from "./Logo";
 import { SearchBox } from "./Search";
 
@@ -134,6 +135,7 @@ export function Sidebar({ world, onAbout }: { world: WorldData; onAbout: () => v
               <span className="num">{countryCount}</span> países
             </p>
           </div>
+          <GithubButton />
           <button
             className="icon-btn"
             onClick={() => setState({ sidebarOpen: false })}
@@ -275,7 +277,7 @@ export function Sidebar({ world, onAbout }: { world: WorldData; onAbout: () => v
   );
 }
 
-// Com o painel recolhido: marca e zapear à esquerda; busca, Satélite e Sobre à direita.
+// Com o painel recolhido: marca, zapear e GitHub à esquerda; busca, Satélite e Sobre à direita.
 export function CollapsedBar({ world, onAbout }: { world: WorldData; onAbout: () => void }) {
   const zapping = useStore((s) => s.zapping);
   return (
@@ -302,6 +304,7 @@ export function CollapsedBar({ world, onAbout }: { world: WorldData; onAbout: ()
         >
           {zapping ? <Square size={14} strokeWidth={2} /> : <Shuffle {...ICON} />}
         </button>
+        <GithubButton />
       </div>
       <div className="mini-bar mini-right">
         <SearchBox world={world} />
