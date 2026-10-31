@@ -1,8 +1,9 @@
 import { useMemo, useState } from "react";
-import { ChevronDown, Globe, Info, Layers, PanelLeftClose, PanelLeftOpen, Shuffle, Square } from "lucide-react";
+import { ChevronDown, Info, Layers, PanelLeftClose, PanelLeftOpen, Shuffle, Square } from "lucide-react";
 import { CATEGORY_COLORS, catName, countryOf, langName, type WorldData } from "../data";
 import { getState, matchesFilters, randomChannel, setState, tune, useStore } from "../store";
 import { ChannelRow } from "./ChannelRow";
+import { Logo } from "./Logo";
 import { SearchBox } from "./Search";
 
 const fmt = (n: number) => n.toLocaleString("pt-BR");
@@ -124,9 +125,7 @@ export function Sidebar({ world, onAbout }: { world: WorldData; onAbout: () => v
     <aside className="sidebar" aria-label="Painel">
       <div className="sidebar-top">
         <header className="brand">
-          <span className="brand-mark" aria-hidden>
-            <Globe size={18} strokeWidth={1.75} />
-          </span>
+          <Logo />
           <div className="brand-text">
             <h1>TV do Mundo</h1>
             <p>
@@ -290,7 +289,10 @@ export function CollapsedBar({ world, onAbout }: { world: WorldData; onAbout: ()
         >
           <PanelLeftOpen {...ICON} />
         </button>
-        <span className="mini-brand">TV do Mundo</span>
+        <span className="mini-brand">
+          <Logo size={22} />
+          TV do Mundo
+        </span>
         <button
           className={`icon-btn ${zapping ? "is-on" : ""}`}
           onClick={toggleZap}

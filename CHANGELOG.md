@@ -17,6 +17,7 @@ O formato segue o [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/) e 
   escolha fica salva no navegador.
 - Os pontos do globo e os chips de categoria usam a mesma paleta, então os chips servem de legenda do mapa.
 - Fundo liso no lugar do céu estrelado.
+- Nova logo (planeta com órbita), usada no painel, na barra recolhida, na tela de carregamento e no ícone da aba.
 
 ### Adicionado
 

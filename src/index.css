@@ -328,16 +328,9 @@ a {
   gap: 12px;
 }
 
-.brand-mark {
-  display: grid;
-  place-items: center;
-  width: 36px;
-  height: 36px;
+.logo-mark {
+  display: block;
   flex: none;
-  border: 1px solid var(--field-border);
-  border-radius: 10px;
-  background: var(--field);
-  color: var(--accent);
 }
 
 .brand-text {
@@ -698,6 +691,9 @@ button.chip:hover {
 }
 
 .mini-brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
   padding: 0 4px;
   font-weight: 600;
   white-space: nowrap;

@@ -1,11 +1,12 @@
 import { useEffect, useState } from "react";
-import { Globe, LoaderCircle, X } from "lucide-react";
+import { LoaderCircle, X } from "lucide-react";
 import { loadWorld, type WorldData } from "./data";
 import { getState, randomChannel, setState, tune, useStore } from "./store";
 import { GlobeView } from "./globe/GlobeView";
 import { Player } from "./ui/Player";
 import { CollapsedBar, Sidebar } from "./ui/Sidebar";
 import { Hud, Tooltip } from "./ui/Overlays";
+import { Logo } from "./ui/Logo";
 import { SEARCH_INPUT_ID } from "./ui/Search";
 
 export default function App() {
@@ -68,9 +69,7 @@ export default function App() {
 function Splash() {
   return (
     <div className="splash">
-      <span className="brand-mark" aria-hidden>
-        <Globe size={18} strokeWidth={1.75} />
-      </span>
+      <Logo size={48} />
       <h1>TV do Mundo</h1>
       <p>
         <LoaderCircle className="spin" size={14} strokeWidth={1.75} aria-hidden />
