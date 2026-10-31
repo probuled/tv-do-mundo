@@ -97,3 +97,8 @@ do outro lado do globo somem, o canal tocando pulsa, e a seleção busca o ponto
 - Bandeiras: [flag-icons](https://github.com/lipis/flag-icons) (MIT)
 - Inspiração do visual "satélite": [bilawalsidhu/gods-eye-view](https://github.com/bilawalsidhu/gods-eye-view) (MIT).
   Os efeitos daqui são uma versão própria e simplificada em CSS, sem código copiado.
+
+## Licença
+
+Código sob a licença [MIT](LICENSE). Os canais, as coordenadas e as imagens seguem as licenças das fontes listadas
+em Créditos.

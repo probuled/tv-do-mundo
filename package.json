@@ -55,5 +55,10 @@
   "validate-branch-name": {
     "pattern": "^(main|develop)$|^(feature|fix|hotfix|refactor|chore|docs|ci|build)/APP-[0-9]+-[a-z0-9]+(-[a-z0-9]+)*$|^release/[0-9]+\\.[0-9]+\\.[0-9]+$",
     "errorMsg": "Nome de branch inválido. Use <tipo>/APP-<n>-<descricao-kebab> (ex.: feature/APP-14-tela-pedidos) ou release/X.Y.Z."
+  },
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/probuled/tv-do-mundo.git"
   }
 }
