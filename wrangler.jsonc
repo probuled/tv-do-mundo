@@ -1,6 +1,7 @@
 // Configuração do deploy no Cloudflare Workers (só arquivos estáticos, sem script).
 // Sem este arquivo, o `wrangler deploy` da main se configurava sozinho, mas o
 // `wrangler versions upload` dos builds de branch falhava com "Missing entry-point".
+// O app só usa a raiz (com ?canal=); outros caminhos recebem o public/404.html.
 {
   "name": "tv-do-mundo",
   "compatibility_date": "2026-10-23",
@@ -9,6 +10,6 @@
   },
   "assets": {
     "directory": "./dist",
-    "not_found_handling": "single-page-application",
+    "not_found_handling": "404-page",
   },
 }
