@@ -6,6 +6,8 @@ import {
   localTime,
   placeLabel,
   playableStreams,
+  safeUrl,
+  sanitizeChannel,
   subsolarPoint,
   type Channel,
   type WorldData,
@@ -47,6 +49,22 @@ describe("playableStreams", () => {
 
   it("descarta streams HTTP quando a página é HTTPS", () => {
     expect(playableStreams(ch, true).map(([u]) => u)).toEqual(["https://c.m3u8", "https://b.m3u8"]);
+  });
+});
+
+describe("safeUrl", () => {
+  it("aceita só endereços http e https", () => {
+    expect(safeUrl("https://a.com")).toBe("https://a.com");
+    expect(safeUrl("HTTP://a.com")).toBe("HTTP://a.com");
+    expect(safeUrl("javascript:alert(1)")).toBeUndefined();
+    expect(safeUrl(" javascript:alert(1)")).toBeUndefined();
+    expect(safeUrl("data:text/html,x")).toBeUndefined();
+    expect(safeUrl(undefined)).toBeUndefined();
+  });
+
+  it("tira do canal o site e o logo com endereço perigoso", () => {
+    const ch = { ...channel([]), w: "javascript:alert(1)", lg: "https://i.imgur.com/a.png" };
+    expect(sanitizeChannel(ch)).toEqual({ ...channel([]), lg: "https://i.imgur.com/a.png" });
   });
 });
 

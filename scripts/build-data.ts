@@ -351,12 +351,15 @@ for (const { ch, place } of placed) {
 console.log("canais por nível:", levelStats);
 
 // espiral dourada em volta do lugar: mais espaçada quanto menos preciso
+// Site e logo vão para href/src no app: só aceitar http(s), nunca "javascript:".
+const safeUrl = (url: string | null | undefined) => (url && /^https?:\/\//i.test(url) ? url : undefined);
+
 const GOLDEN = Math.PI * (3 - Math.sqrt(5));
 const STEP: Record<Level, number> = { city: 0.06, subdivision: 0.1, country: 0.16 };
 
 const logoBy = new Map<string, string>();
 for (const l of logos) {
-  if (!l.in_use) continue;
+  if (!l.in_use || !safeUrl(l.url)) continue;
   if (!logoBy.has(l.channel) || l.feed === null) logoBy.set(l.channel, l.url);
 }
 
@@ -400,7 +403,7 @@ for (const g of [...groups.values()].sort((a, b) => b.items.length - a.items.len
       ...(logoBy.has(ch.id) ? { lg: logoBy.get(ch.id) } : {}),
       ...(langs.length ? { l: langs } : {}),
       ...(main?.timezones?.[0] ? { tz: main.timezones[0] } : {}),
-      ...(ch.website ? { w: ch.website } : {}),
+      ...(safeUrl(ch.website) ? { w: ch.website } : {}),
       ...(stateOf.has(ch.id) ? { st: stateOf.get(ch.id) } : {}),
       ...(nationalIds.has(ch.id) ? { nat: 1 } : {}),
     });
