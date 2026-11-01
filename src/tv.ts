@@ -1,5 +1,5 @@
 // Lógica do modo TV: numeração fixa dos canais e a lista que aparece na grade.
-import { countryOf, type WorldData } from "./data";
+import { countryOf, stateName, type Channel, type WorldData } from "./data";
 import { matchesTerms, searchTerms } from "./search";
 import { EMPTY_FILTERS, matchesFilters, type Filters, type State } from "./store";
 
@@ -84,4 +84,23 @@ export function neighborChannel(list: number[], current: number | null, step: 1 
   const pos = current === null ? -1 : list.indexOf(current);
   if (pos === -1) return step === 1 ? list[0] : list[list.length - 1];
   return list[(pos + step + list.length) % list.length];
+}
+
+// Iniciais para quando o canal não tem logo (ou o logo não carrega): "AgroMais" -> "A", "Arte 1" -> "A1", "AXN" -> "AXN".
+export function initials(name: string): string {
+  const words = name.trim().split(/\s+/).filter(Boolean);
+  if (!words.length) return "?";
+  if (words.length === 1) {
+    const w = words[0];
+    return w.length <= 3 && w === w.toUpperCase() ? w : w[0].toUpperCase();
+  }
+  return (words[0][0] + words[1][0]).toUpperCase();
+}
+
+// Lugar curto para a lista: a cidade, senão o estado, senão o país.
+export function shortPlace(world: WorldData, ch: Channel): string {
+  const place = world.places[ch.p];
+  if (place?.lv === "ct") return place.n;
+  if (place?.lv === "s") return ch.st ? stateName(world, ch.st) : place.n;
+  return countryOf(world, ch.c)[0];
 }

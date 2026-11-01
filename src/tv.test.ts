@@ -2,7 +2,7 @@ import { beforeEach, describe, expect, it } from "vitest";
 import type { Channel, WorldData } from "./data";
 import { buildSearchIndex } from "./search";
 import { EMPTY_FILTERS, getState, setState } from "./store";
-import { categoryCounts, guideChannels, neighborChannel, numberChannels } from "./tv";
+import { categoryCounts, guideChannels, initials, neighborChannel, numberChannels, shortPlace } from "./tv";
 
 const ch = (id: string, extra: Partial<Channel>): Channel => ({
   id,
@@ -22,7 +22,10 @@ const world: WorldData = {
   countries: {},
   categories: {},
   languages: {},
-  places: [],
+  places: [
+    { n: "Brasil", lv: "c", la: 0, lo: 0, c: "BR" },
+    { n: "Salvador", lv: "ct", la: 0, lo: 0, c: "BR" },
+  ],
   channels: [
     ch("zeta.ar", { n: "Zeta", c: "AR", cat: ["sports"] }), // 0
     ch("tv-local.br", { n: "TV Local", st: "BR-BA", cat: ["news"] }), // 1
@@ -95,5 +98,22 @@ describe("neighborChannel", () => {
     expect(neighborChannel([5, 7, 9], null, 1)).toBe(5);
     expect(neighborChannel([5, 7, 9], 2, -1)).toBe(9);
     expect(neighborChannel([], 2, 1)).toBeNull();
+  });
+});
+
+describe("initials", () => {
+  it("usa as iniciais das duas primeiras palavras ou a sigla", () => {
+    expect(initials("AgroMais")).toBe("A");
+    expect(initials("Arte 1")).toBe("A1");
+    expect(initials("Band Sports")).toBe("BS");
+    expect(initials("AXN")).toBe("AXN");
+    expect(initials("  ")).toBe("?");
+  });
+});
+
+describe("shortPlace", () => {
+  it("mostra a cidade, senão o país", () => {
+    expect(shortPlace(world, { ...world.channels[1], p: 1 })).toBe("Salvador");
+    expect(shortPlace(world, world.channels[0])).toBe("Argentina");
   });
 });

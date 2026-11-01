@@ -53,18 +53,22 @@ export function Select({
   value,
   onChange,
   options,
+  allLabel = "Todos",
+  hideLabel,
 }: {
   label: string;
   value: string;
   onChange: (v: string) => void;
   options: { value: string; label: string }[];
+  allLabel?: string; // texto da opção sem filtro
+  hideLabel?: boolean; // o rótulo continua para leitores de tela
 }) {
   return (
     <label className="field">
-      <span className="field-label">{label}</span>
+      <span className={hideLabel ? "sr-only" : "field-label"}>{label}</span>
       <span className="select">
         <select value={value} onChange={(e) => onChange(e.target.value)}>
-          <option value="">Todos</option>
+          <option value="">{allLabel}</option>
           {options.map((o) => (
             <option key={o.value} value={o.value}>
               {o.label}
