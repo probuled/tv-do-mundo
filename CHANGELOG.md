@@ -7,6 +7,22 @@ O formato segue o [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/) e 
 
 ## [Não lançado]
 
+### Adicionado
+
+- Página "Página não encontrada" para endereços que não existem, em vez de abrir o globo em qualquer caminho.
+- `robots.txt`.
+
+### Alterado
+
+- O site abre mais rápido: o player de vídeo só é baixado quando o primeiro canal toca, e as bibliotecas do globo
+  ficam em cache entre uma versão e outra.
+
+### Segurança
+
+- Cabeçalhos de segurança no Cloudflare (Content-Security-Policy, proteção contra o site ser aberto dentro de outro e
+  `nosniff`).
+- Links de site e logos dos canais só aceitam endereços `http` e `https`.
+
 ## [0.6.0] - 2026-10-31
 
 ### Adicionado
