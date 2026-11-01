@@ -60,7 +60,7 @@ export default function App() {
       ) : (
         <CollapsedBar world={world} onAbout={() => setDialog("about")} onSignal={() => setDialog("signal")} />
       )}
-      <Player world={world} />
+      <Player world={world} onSignal={() => setDialog("signal")} />
       <Tooltip world={world} />
       {dialog === "about" && <About world={world} onClose={() => setDialog(null)} />}
       {dialog === "signal" && <SignalHelp onClose={() => setDialog(null)} />}

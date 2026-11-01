@@ -12,6 +12,7 @@ import {
   type WorldData,
 } from "../data";
 import { Flag } from "./Flag";
+import { SignalButton } from "./Sidebar";
 import { getState, markFailed, randomChannel, setState, toggleFavorite, tune, useStore } from "../store";
 
 const START_TIMEOUT = 12_000;
@@ -29,7 +30,7 @@ function friendly(reason: string) {
 type Status =
   { kind: "loading"; attempt: number; total: number } | { kind: "playing" } | { kind: "failed"; reason: string };
 
-export function Player({ world }: { world: WorldData }) {
+export function Player({ world, onSignal }: { world: WorldData; onSignal: () => void }) {
   const current = useStore((s) => s.current);
   const zapping = useStore((s) => s.zapping);
   const favorites = useStore((s) => s.favorites);
@@ -268,6 +269,7 @@ export function Player({ world }: { world: WorldData }) {
             <Link {...ICON} aria-hidden />
             {copied ? "Link copiado" : "Compartilhar"}
           </button>
+          <SignalButton compact onClick={onSignal} />
           {ch.w && (
             <a className="btn btn-sm btn-ghost" href={ch.w} target="_blank" rel="noreferrer">
               Site
