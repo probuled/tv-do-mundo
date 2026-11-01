@@ -18,8 +18,11 @@ export const EMPTY_FILTERS: Filters = {
   verifiedOnly: false,
 };
 
+export type View = "globe" | "tv"; // globo 3D ou grade de canais (modo TV)
+
 export interface State {
   world: WorldData | null;
+  view: View;
   current: number | null; // índice do canal tocando
   hover: number | null;
   zapping: boolean;
@@ -50,6 +53,7 @@ const save = (k: string, v: unknown) => {
 
 let state: State = {
   world: null,
+  view: load<View>("tvm:view", "globe") === "tv" ? "tv" : "globe",
   current: null,
   hover: null,
   zapping: false,
@@ -70,6 +74,7 @@ export function setState(patch: Partial<State>) {
   if (patch.favorites) save("tvm:favorites", patch.favorites);
   if (patch.history) save("tvm:history", patch.history);
   if (patch.sidebarOpen !== undefined) save("tvm:sidebar", patch.sidebarOpen);
+  if (patch.view) save("tvm:view", patch.view);
   listeners.forEach((l) => l());
 }
 const subscribe = (l: () => void) => {

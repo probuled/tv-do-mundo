@@ -6,6 +6,7 @@ import { ChannelRow } from "./ChannelRow";
 import { GithubButton } from "./GithubButton";
 import { Logo } from "./Logo";
 import { SearchBox } from "./Search";
+import { ViewSwitch } from "./ViewSwitch";
 import { fmt, toggleZap, useFilterOptions } from "./filters";
 
 const ICON = { size: 16, strokeWidth: 1.75 } as const;
@@ -129,6 +130,8 @@ export function Sidebar({ world, onAbout, onSignal }: { world: WorldData; onAbou
             <PanelLeftClose {...ICON} />
           </button>
         </header>
+
+        <ViewSwitch />
 
         <SearchBox world={world} />
 
@@ -303,6 +306,7 @@ export function CollapsedBar({
           {zapping ? <Square size={14} strokeWidth={2} /> : <Shuffle {...ICON} />}
         </button>
         <GithubButton />
+        <ViewSwitch compact />
       </div>
       <div className="mini-bar mini-right">
         <SearchBox world={world} />
