@@ -1,32 +1,23 @@
 import { useMemo, useState } from "react";
 import { Search } from "lucide-react";
-import { countryOf, placeLabel, stateName, type WorldData } from "../data";
+import type { WorldData } from "../data";
+import { buildSearchIndex, matchesTerms, searchTerms, strip } from "../search";
 import { setState, tune } from "../store";
 import { ChannelRow } from "./ChannelRow";
 
 export const SEARCH_INPUT_ID = "search-input";
 
-const strip = (s: string) => s.toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g, "");
-
 export function SearchBox({ world }: { world: WorldData }) {
   const [q, setQ] = useState("");
   const [open, setOpen] = useState(false);
   const [active, setActive] = useState(0);
-  const index = useMemo(
-    () =>
-      world.channels.map((ch) =>
-        strip(
-          `${ch.n} ${countryOf(world, ch.c)[0]} ${world.countries[ch.c]?.[0] ?? ""} ${placeLabel(world, ch)} ${ch.st ? stateName(world, ch.st) : ""} ${ch.id}`,
-        ),
-      ),
-    [world],
-  );
+  const index = useMemo(() => buildSearchIndex(world), [world]);
   const results = useMemo(() => {
-    const terms = strip(q).split(/\s+/).filter(Boolean);
+    const terms = searchTerms(q);
     if (!terms.length) return [];
     const out: number[] = [];
     for (let i = 0; i < index.length && out.length < 40; i++) {
-      if (terms.every((t) => index[i].includes(t))) out.push(i);
+      if (matchesTerms(index[i], terms)) out.push(i);
     }
     // nome que começa com o termo vem antes
     const t0 = terms[0];
