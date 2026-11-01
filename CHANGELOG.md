@@ -9,6 +9,11 @@ O formato segue o [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/) e 
 
 ### Adicionado
 
+- Modo TV: além do globo, os canais podem ser vistos numa grade, como numa TV. Cada canal tem um número fixo (o
+  Brasil abre a numeração), há uma coluna de categorias com a contagem de canais e filtros por país, estado, idioma e
+  busca. As setas para cima e para baixo trocam de canal, e digitar um número leva direto ao canal.
+- Troca entre "Globo" e "TV" no painel lateral, na barra do painel recolhido e no topo do modo TV. A escolha fica
+  salva no navegador.
 - Botão "Fora do ar?" também no card do player, ao lado de Próximo aleatório e Compartilhar.
 
 ## [0.5.0] - 2026-10-31
