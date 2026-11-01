@@ -1,20 +1,15 @@
 import { useMemo, useState } from "react";
 import { ChevronDown, Info, Layers, PanelLeftClose, PanelLeftOpen, RadioTower, Shuffle, Square } from "lucide-react";
-import { CATEGORY_COLORS, catName, countryOf, langName, stateName, type WorldData } from "../data";
-import { EMPTY_FILTERS, getState, matchesFilters, NO_STATE, randomChannel, setState, tune, useStore } from "../store";
+import { CATEGORY_COLORS, catName, type WorldData } from "../data";
+import { EMPTY_FILTERS, getState, matchesFilters, setState, tune, useStore } from "../store";
 import { ChannelRow } from "./ChannelRow";
 import { GithubButton } from "./GithubButton";
 import { Logo } from "./Logo";
 import { SearchBox } from "./Search";
+import { ViewSwitch } from "./ViewSwitch";
+import { fmt, toggleZap, useFilterOptions } from "./filters";
 
-const fmt = (n: number) => n.toLocaleString("pt-BR");
 const ICON = { size: 16, strokeWidth: 1.75 } as const;
-
-function toggleZap() {
-  const on = !getState().zapping;
-  setState({ zapping: on });
-  if (on) tune(randomChannel());
-}
 
 function useCountries(world: WorldData) {
   return useMemo(() => new Set(world.channels.map((c) => c.c)).size, [world]);
@@ -53,23 +48,27 @@ export function SignalButton({ compact, onClick }: { compact?: boolean; onClick:
   );
 }
 
-function Select({
+export function Select({
   label,
   value,
   onChange,
   options,
+  allLabel = "Todos",
+  hideLabel,
 }: {
   label: string;
   value: string;
   onChange: (v: string) => void;
   options: { value: string; label: string }[];
+  allLabel?: string; // texto da opção sem filtro
+  hideLabel?: boolean; // o rótulo continua para leitores de tela
 }) {
   return (
     <label className="field">
-      <span className="field-label">{label}</span>
+      <span className={hideLabel ? "sr-only" : "field-label"}>{label}</span>
       <span className="select">
         <select value={value} onChange={(e) => onChange(e.target.value)}>
-          <option value="">Todos</option>
+          <option value="">{allLabel}</option>
           {options.map((o) => (
             <option key={o.value} value={o.value}>
               {o.label}
@@ -99,46 +98,7 @@ export function Sidebar({ world, onAbout, onSignal }: { world: WorldData; onAbou
     return n;
   }, [world, filters]);
 
-  // categorias e idiomas mais comuns primeiro
-  const cats = useMemo(() => {
-    const c = new Map<string, number>();
-    for (const ch of world.channels) for (const k of ch.cat) c.set(k, (c.get(k) ?? 0) + 1);
-    return [...c].sort((a, b) => b[1] - a[1]);
-  }, [world]);
-  const langs = useMemo(() => {
-    const c = new Map<string, number>();
-    for (const ch of world.channels) for (const k of ch.l ?? []) c.set(k, (c.get(k) ?? 0) + 1);
-    return [...c]
-      .sort((a, b) => b[1] - a[1])
-      .slice(0, 40)
-      .map(([l, n]) => ({ value: l, label: `${langName(world, l)} (${fmt(n)})` }));
-  }, [world]);
-  const countries = useMemo(() => {
-    const c = new Map<string, number>();
-    for (const ch of world.channels) c.set(ch.c, (c.get(ch.c) ?? 0) + 1);
-    return [...c]
-      .map(([code, n]) => ({ value: code, label: `${countryOf(world, code)[0]} (${fmt(n)})` }))
-      .sort((a, b) => a.label.localeCompare(b.label));
-  }, [world]);
-
-  // estados do país escolhido, com a contagem; quem não tem estado vai para "Nacionais e sem estado"
-  const states = useMemo(() => {
-    if (!filters.country) return [];
-    const c = new Map<string, number>();
-    let none = 0;
-    for (const ch of world.channels) {
-      if (ch.c !== filters.country) continue;
-      if (ch.st) c.set(ch.st, (c.get(ch.st) ?? 0) + 1);
-      else none++;
-    }
-    if (!c.size) return [];
-    return [
-      ...[...c]
-        .map(([code, n]) => ({ value: code, label: `${stateName(world, code)} (${fmt(n)})` }))
-        .sort((a, b) => a.label.localeCompare(b.label, "pt-BR")),
-      ...(none ? [{ value: NO_STATE, label: `Nacionais e sem estado (${fmt(none)})` }] : []),
-    ];
-  }, [world, filters.country]);
+  const { cats, langs, countries, states } = useFilterOptions(world, filters.country);
 
   const setF = (patch: Partial<typeof filters>) => setState({ filters: { ...getState().filters, ...patch } });
   const toggleCat = (c: string) =>
@@ -174,6 +134,8 @@ export function Sidebar({ world, onAbout, onSignal }: { world: WorldData; onAbou
             <PanelLeftClose {...ICON} />
           </button>
         </header>
+
+        <ViewSwitch />
 
         <SearchBox world={world} />
 
@@ -348,6 +310,7 @@ export function CollapsedBar({
           {zapping ? <Square size={14} strokeWidth={2} /> : <Shuffle {...ICON} />}
         </button>
         <GithubButton />
+        <ViewSwitch compact />
       </div>
       <div className="mini-bar mini-right">
         <SearchBox world={world} />

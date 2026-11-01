@@ -9,11 +9,13 @@ import { Hud, Tooltip } from "./ui/Overlays";
 import { Logo } from "./ui/Logo";
 import { REPO_URL } from "./ui/GithubButton";
 import { SEARCH_INPUT_ID } from "./ui/Search";
+import { TvGuide } from "./ui/TvGuide";
 
 export default function App() {
   const world = useStore((s) => s.world);
   const spy = useStore((s) => s.spy);
   const sidebarOpen = useStore((s) => s.sidebarOpen);
+  const view = useStore((s) => s.view);
   const [error, setError] = useState<string | null>(null);
   const [dialog, setDialog] = useState<"about" | "signal" | null>(null);
 
@@ -41,7 +43,7 @@ export default function App() {
         setState({ zapping: on });
         if (on) tune(randomChannel());
       } else if (k === "r") tune(randomChannel());
-      else if (k === "v") setState({ spy: !getState().spy });
+      else if (k === "v" && getState().view === "globe") setState({ spy: !getState().spy });
       else if (k === "escape") setState({ current: null, zapping: false });
     };
     window.addEventListener("keydown", key);
@@ -52,16 +54,22 @@ export default function App() {
   if (!world) return <Splash />;
 
   return (
-    <div className={`app ${spy ? "spy" : ""} ${sidebarOpen ? "has-sidebar" : ""}`}>
-      <GlobeView world={world} />
-      <Hud world={world} />
-      {sidebarOpen ? (
-        <Sidebar world={world} onAbout={() => setDialog("about")} onSignal={() => setDialog("signal")} />
+    <div className={view === "tv" ? "app tv-mode" : `app ${spy ? "spy" : ""} ${sidebarOpen ? "has-sidebar" : ""}`}>
+      {view === "tv" ? (
+        <TvGuide world={world} onAbout={() => setDialog("about")} onSignal={() => setDialog("signal")} />
       ) : (
-        <CollapsedBar world={world} onAbout={() => setDialog("about")} onSignal={() => setDialog("signal")} />
+        <>
+          <GlobeView world={world} />
+          <Hud world={world} />
+          {sidebarOpen ? (
+            <Sidebar world={world} onAbout={() => setDialog("about")} onSignal={() => setDialog("signal")} />
+          ) : (
+            <CollapsedBar world={world} onAbout={() => setDialog("about")} onSignal={() => setDialog("signal")} />
+          )}
+          <Tooltip world={world} />
+          <Player world={world} onSignal={() => setDialog("signal")} />
+        </>
       )}
-      <Player world={world} />
-      <Tooltip world={world} />
       {dialog === "about" && <About world={world} onClose={() => setDialog(null)} />}
       {dialog === "signal" && <SignalHelp onClose={() => setDialog(null)} />}
     </div>

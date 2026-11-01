@@ -26,7 +26,8 @@
 
 O TV do Mundo é um globo 3D no navegador em que cada canal de TV aberta ao vivo é um ponto de luz. São cerca de
 9.600 canais de 179 países. Clique num ponto para assistir na hora, ou aperte **Zapear pelo planeta** e deixe o
-globo viajar sozinho de canal em canal.
+globo viajar sozinho de canal em canal. Se preferir algo mais parecido com uma TV de verdade, troque para o
+**Modo TV**: uma grade de canais numerados, com a tela no meio e o controle remoto no teclado.
 
 **Em produção:** [tv-do-mundo.probuled.workers.dev](https://tv-do-mundo.probuled.workers.dev/), hospedado no
 Cloudflare. A versão publicada é sempre a da branch `main`.
@@ -42,6 +43,9 @@ Cloudflare. A versão publicada é sempre a da branch `main`.
   da categoria, então os chips do painel funcionam como legenda do mapa.
 - **Buscar.** Por nome do canal, país ou cidade, com o atalho `/`.
 - **Guardar.** Favoritos e histórico ficam salvos no navegador, e cada canal tem um link para compartilhar.
+- **Entender por que um canal não abre.** O botão **Fora do ar?** explica cada mensagem de erro do player (bloqueio
+  regional, link vencido, servidor lento, formato que o navegador não toca) e mostra que, na maioria das vezes, a
+  falha é temporária.
 - **Ligar o visual Satélite.** Visão noturna verde, linhas de varredura e uma faixa de telemetria com o horário UTC,
   as coordenadas e a hora local do canal.
 
@@ -55,6 +59,34 @@ Cloudflare. A versão publicada é sempre a da branch `main`.
   <sub>No celular, o painel vira uma gaveta e o player abre embaixo.</sub>
 </p>
 
+## Modo TV
+
+Além do globo, os canais podem ser vistos como numa TV. Use a troca **Globo | TV** no topo do painel (ou na barra do
+painel recolhido). A escolha fica salva no navegador.
+
+![Modo TV: categorias à esquerda, a tela no meio e a lista de canais numerados à direita](docs/images/modo-tv.jpg)
+
+- **Canais numerados.** Cada canal tem um número fixo, como numa TV: o Brasil abre a numeração, com as redes
+  nacionais primeiro, e depois vêm os outros países em ordem alfabética. O número não muda com os filtros.
+- **Navegação à esquerda.** Busca, Favoritos, Histórico e as categorias com a contagem de canais.
+- **Lista à direita.** Filtros por país, idioma e estado, com o logo, a cidade, a categoria e a hora local de cada
+  canal. O canal que está tocando fica destacado.
+- **A tela no meio.** Mostra **AO VIVO** e o número do canal, com controles próprios: pausar, som, canal anterior e
+  próximo, janela flutuante e tela cheia. Quando um canal falha, a própria tela oferece o próximo canal e a
+  explicação do erro.
+- **Controle remoto no teclado.** As setas trocam de canal, digitar um número (por exemplo `25`) leva direto ao canal
+  e `F` abre a tela cheia.
+
+| Categoria e país escolhidos                                                                            | Janela "Fora do ar?"                                                                |
+| ------------------------------------------------------------------------------------------------------ | ----------------------------------------------------------------------------------- |
+| ![Modo TV filtrado por Esportes no Brasil, com um canal fora do ar](docs/images/modo-tv-categoria.jpg) | ![Janela que explica cada mensagem de canal fora do ar](docs/images/fora-do-ar.jpg) |
+
+<p align="center">
+  <img src="docs/images/modo-tv-celular.jpg" width="260" alt="Modo TV no celular" />
+  <br />
+  <sub>No celular, o modo TV vira uma coluna só: navegação, tela, informações e lista.</sub>
+</p>
+
 ### Atalhos
 
 | Tecla | Ação                |
@@ -64,6 +96,14 @@ Cloudflare. A versão publicada é sempre a da branch `main`.
 | `R`   | Canal aleatório     |
 | `V`   | Visual Satélite     |
 | `Esc` | Fechar o player     |
+
+No modo TV:
+
+| Tecla     | Ação                      |
+| --------- | ------------------------- |
+| `↑` `↓`   | Canal anterior e próximo  |
+| `0` a `9` | Digitar o número do canal |
+| `F`       | Tela cheia                |
 
 ## Como funciona
 
@@ -134,8 +174,13 @@ scripts/build-data.ts     API do iptv-org + coordenadas do Wikidata -> public/da
 scripts/check-streams.ts  teste de todos os streams -> .cache/health.json
 src/globe/GlobeView.tsx   globo, shader de dia e noite e a camada de pontos dos canais
 src/ui/Sidebar.tsx        painel lateral e a barra do painel recolhido
-src/ui/Player.tsx         player, tentativa de cada fonte e o modo zapear
+src/ui/Player.tsx         player do globo
+src/ui/useChannelStream.ts  tentativa de cada fonte do canal e o modo zapear (usado pelos dois players)
+src/ui/TvGuide.tsx        modo TV: navegação, lista de canais numerados e o controle remoto no teclado
+src/ui/TvPlayer.tsx       tela do modo TV, com controles próprios e as informações do canal
 src/ui/Search.tsx         busca de canais
+src/search.ts             índice de busca, compartilhado pela busca e pelo modo TV
+src/tv.ts                 numeração dos canais e a lista do modo TV
 src/ui/Overlays.tsx       telemetria do visual Satélite e tooltip
 ```
 
