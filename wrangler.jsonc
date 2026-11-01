@@ -5,10 +5,10 @@
   "name": "tv-do-mundo",
   "compatibility_date": "2026-10-23",
   "build": {
-    "command": "npm run build"
+    "command": "npm run build",
   },
   "assets": {
     "directory": "./dist",
-    "not_found_handling": "single-page-application"
-  }
+    "not_found_handling": "single-page-application",
+  },
 }
