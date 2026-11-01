@@ -1,0 +1,20 @@
+# Cabeçalhos do Cloudflare Workers Assets (o nginx do Docker não lê este arquivo).
+# Logos e streams vêm de milhares de domínios, por isso img, media e connect
+# liberam qualquer https:. O hls.js roda num worker criado a partir de blob:.
+
+/*
+  Content-Security-Policy: default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https:; media-src 'self' data: blob: https:; connect-src 'self' https:; worker-src 'self' blob:; font-src 'self' data:; object-src 'none'; base-uri 'none'; form-action 'none'; frame-ancestors 'none'
+  X-Frame-Options: DENY
+  X-Content-Type-Options: nosniff
+  Referrer-Policy: no-referrer
+  Permissions-Policy: camera=(), microphone=(), geolocation=(), payment=(), usb=(), interest-cohort=()
+  Cross-Origin-Opener-Policy: same-origin
+  Strict-Transport-Security: max-age=31536000
+
+# arquivos com hash no nome podem ficar em cache para sempre
+/assets/*
+  Cache-Control: public, max-age=31536000, immutable
+
+# as texturas da Terra quase nunca mudam
+/textures/*
+  Cache-Control: public, max-age=604800

@@ -41,7 +41,19 @@ export interface WorldData {
 export async function loadWorld(): Promise<WorldData> {
   const res = await fetch(`${import.meta.env.BASE_URL}data/channels.json`);
   if (!res.ok) throw new Error(`Falha ao carregar canais (${res.status})`);
-  return res.json();
+  const world: WorldData = await res.json();
+  world.channels.forEach(sanitizeChannel);
+  return world;
+}
+
+// Site, logo e streams vêm do iptv-org e do Wikidata, fora do nosso controle.
+// Só passam endereços http(s), para um "javascript:" nunca chegar a um href.
+export const safeUrl = (url: string | undefined) => (url && /^https?:\/\//i.test(url) ? url : undefined);
+
+export function sanitizeChannel(ch: Channel): Channel {
+  if (!safeUrl(ch.w)) delete ch.w;
+  if (!safeUrl(ch.lg)) delete ch.lg;
+  return ch;
 }
 
 // Paleta discreta de seis tons, repetida na ordem das categorias mais comuns.

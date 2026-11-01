@@ -1,9 +1,13 @@
 import { useEffect, useRef, useState } from "react";
-import Hls from "hls.js";
+import type Hls from "hls.js";
 import { playableStreams, type WorldData } from "../data";
 import { getState, markFailed, randomChannel, tune, useStore } from "../store";
 
 const START_TIMEOUT = 12_000;
+
+// O hls.js (~500 kB) só é baixado na primeira vez que um canal toca.
+let hlsModule: Promise<typeof Hls> | undefined;
+const loadHls = () => (hlsModule ??= import("hls.js").then((m) => m.default));
 
 // Erros do hls.js -> explicação para gente
 function friendly(reason: string) {
@@ -60,22 +64,33 @@ export function useChannelStream(world: WorldData) {
       setStatus({ kind: "loading", attempt: attempt + 1, total: streams.length });
       const [url] = streams[attempt];
       timer = window.setTimeout(() => next("Tempo esgotado."), START_TIMEOUT);
-      if (url.includes(".m3u8") && Hls.isSupported()) {
-        hls = new Hls({
-          enableWorker: true,
-          lowLatencyMode: false,
-          manifestLoadingMaxRetry: 1,
-          levelLoadingMaxRetry: 1,
-          fragLoadingMaxRetry: 2,
-        });
-        hls.on(Hls.Events.ERROR, (_, data) => {
-          if (data.fatal) next(data.details);
-        });
-        hls.loadSource(url);
-        hls.attachMedia(v);
-      } else {
-        v.src = url; // Safari toca HLS nativo; ou é um arquivo direto
-      }
+      if (!url.includes(".m3u8")) return playDirect(url);
+      const n = attempt;
+      loadHls().then(
+        (HlsClass) => {
+          if (cancelled || n !== attempt) return;
+          if (!HlsClass.isSupported()) return playDirect(url);
+          hls = new HlsClass({
+            enableWorker: true,
+            lowLatencyMode: false,
+            manifestLoadingMaxRetry: 1,
+            levelLoadingMaxRetry: 1,
+            fragLoadingMaxRetry: 2,
+          });
+          hls.on(HlsClass.Events.ERROR, (_, data) => {
+            if (data.fatal) next(data.details);
+          });
+          hls.loadSource(url);
+          hls.attachMedia(v);
+          play();
+        },
+        () => !cancelled && n === attempt && next("Falha ao carregar o player."),
+      );
+    };
+
+    // Safari toca HLS nativo; ou é um arquivo direto
+    const playDirect = (url: string) => {
+      v.src = url;
       play();
     };
 
